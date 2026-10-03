@@ -14,7 +14,7 @@ withDefaults(
 <template>
   <button
     :type="type"
-    class="btn btn-primary"
+    class="btn btn-info text-white fw-semibold px-4"
     :disabled="disabled"
   >
     <slot />
