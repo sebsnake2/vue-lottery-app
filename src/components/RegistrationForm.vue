@@ -116,12 +116,12 @@ function submitForm() {
 
 <template>
   <section class="card shadow-sm">
-    <div class="card-body">
-      <h2 class="h5 mb-1">
+    <div class="card-body p-4">
+      <h2 class="h6 fw-bold text-uppercase mb-1">
         Register form
       </h2>
 
-      <p class="text-secondary mb-4">
+      <p class="text-secondary small mb-4">
         Please fill in all the fields.
       </p>
 
@@ -156,7 +156,7 @@ function submitForm() {
           :error="errors.phone"
         />
 
-        <div class="d-flex justify-content-end">
+        <div class="d-flex justify-content-end mt-3">
           <AppButton type="submit">
             Save
           </AppButton>

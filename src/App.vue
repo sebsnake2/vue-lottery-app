@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import RegistrationForm from "./components/RegistrationForm.vue";
 import type { Participant, ParticipantFormData } from "./types/participant";
+import ParticipantsTable from "./components/ParticipantsTable.vue";
 
 const participants = ref<Participant[]>([]);
 
@@ -14,6 +15,22 @@ function addParticipant(data: ParticipantFormData) {
     id: crypto.randomUUID(),
     ...data,
   });
+}
+
+function updateParticipant(id: string, data: ParticipantFormData) {
+  const participant = participants.value.find((item) => item.id === id);
+
+  if (!participant) {
+    return;
+  }
+
+  Object.assign(participant, data);
+}
+
+function removeParticipant(id: string) {
+  participants.value = participants.value.filter(
+    (participant) => participant.id !== id,
+  );
 }
 </script>
 
@@ -29,9 +46,11 @@ function addParticipant(data: ParticipantFormData) {
         @submit="addParticipant"
       />
 
-      <div class="mt-4">
-        <strong>Participants: {{ participants.length }}</strong>
-      </div>
+      <ParticipantsTable
+        :participants="participants"
+        @update="updateParticipant"
+        @remove="removeParticipant"
+      />
     </div>
   </main>
 </template>
