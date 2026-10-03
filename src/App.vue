@@ -1,12 +1,36 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import RegistrationForm from "./components/RegistrationForm.vue";
 import ParticipantsTable from "./components/ParticipantsTable.vue";
 import WinnersBlock from "./components/WinnersBlock.vue";
 import type { Participant, ParticipantFormData } from "./types/participant";
 
-const participants = ref<Participant[]>([]);
-const winnerIds = ref<string[]>([]);
+const savedParticipants = localStorage.getItem("participants");
+const savedWinnerIds = localStorage.getItem("winnerIds");
+
+const participants = ref<Participant[]>(
+  savedParticipants ? JSON.parse(savedParticipants) : [],
+);
+
+const winnerIds = ref<string[]>(
+  savedWinnerIds ? JSON.parse(savedWinnerIds) : [],
+);
+
+watch(
+  participants,
+  (value) => {
+    localStorage.setItem("participants", JSON.stringify(value));
+  },
+  { deep: true },
+);
+
+watch(
+  winnerIds,
+  (value) => {
+    localStorage.setItem("winnerIds", JSON.stringify(value));
+  },
+  { deep: true },
+);
 
 const existingEmails = computed(() =>
   participants.value.map((participant) => participant.email),

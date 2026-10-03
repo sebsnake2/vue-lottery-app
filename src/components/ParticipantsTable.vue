@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { computed, reactive, ref } from "vue";
 import AppButton from "./ui/AppButton.vue";
 import AppInput from "./ui/AppInput.vue";
 import AppModal from "./ui/AppModal.vue";
+import SearchBar from "./SearchBar.vue";
+
 import type { Participant, ParticipantFormData } from "../types/participant";
 
 const props = defineProps<{
@@ -16,6 +18,13 @@ const emit = defineEmits<{
 
 const editingParticipant = ref<Participant | null>(null);
 const deletingParticipant = ref<Participant | null>(null);
+
+type SortField = "name" | "dateOfBirth";
+type SortDirection = "asc" | "desc";
+
+const searchQuery = ref("");
+const sortField = ref<SortField | null>(null);
+const sortDirection = ref<SortDirection>("asc");
 
 const editForm = reactive<ParticipantFormData>({
   name: "",
@@ -152,6 +161,52 @@ function formatDate(date: string): string {
 
   return `${day}/${month}/${year}`;
 }
+
+function handleFilterByName(value: string) {
+  searchQuery.value = value;
+}
+
+function setSort(field: SortField) {
+  if (sortField.value === field) {
+    sortDirection.value = sortDirection.value === "asc" ? "desc" : "asc";
+
+    return;
+  }
+
+  sortField.value = field;
+  sortDirection.value = "asc";
+}
+
+const displayedParticipants = computed(() => {
+  let result = [...props.participants];
+
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase();
+
+    result = result.filter((participant) =>
+      participant.name.toLowerCase().includes(query),
+    );
+  }
+
+  if (sortField.value === "name") {
+    result.sort((a, b) => {
+      const comparison = a.name.localeCompare(b.name);
+
+      return sortDirection.value === "asc" ? comparison : -comparison;
+    });
+  }
+
+  if (sortField.value === "dateOfBirth") {
+    result.sort((a, b) => {
+      const comparison =
+        new Date(a.dateOfBirth).getTime() - new Date(b.dateOfBirth).getTime();
+
+      return sortDirection.value === "asc" ? comparison : -comparison;
+    });
+  }
+
+  return result;
+});
 </script>
 
 <template>
@@ -161,11 +216,44 @@ function formatDate(date: string): string {
         Participants
       </h2>
 
+      <SearchBar @filter-by-name="handleFilterByName" />
+
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          @click="setSort('name')"
+        >
+          Name
+          <span v-if="sortField === 'name'">
+            {{ sortDirection === "asc" ? "↑" : "↓" }}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          @click="setSort('dateOfBirth')"
+        >
+          Date of Birth
+          <span v-if="sortField === 'dateOfBirth'">
+            {{ sortDirection === "asc" ? "↑" : "↓" }}
+          </span>
+        </button>
+      </div>
+
       <div
         v-if="participants.length === 0"
         class="text-secondary"
       >
         No participants yet.
+      </div>
+
+      <div
+        v-else-if="displayedParticipants.length === 0"
+        class="text-secondary"
+      >
+        No participants found.
       </div>
 
       <div
@@ -186,7 +274,7 @@ function formatDate(date: string): string {
 
           <tbody>
             <tr
-              v-for="(participant, index) in participants"
+              v-for="(participant, index) in displayedParticipants"
               :key="participant.id"
             >
               <td>{{ index + 1 }}</td>
