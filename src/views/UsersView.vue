@@ -17,6 +17,24 @@ const {
 } = storeToRefs(usersStore);
 
 const limit = 10;
+const deletingId = ref<number | null>(null);
+const deleteError = ref<string | null>(null);
+
+async function deleteUser(id: number) {
+  deletingId.value = id;
+  deleteError.value = null;
+
+  try {
+    await usersStore.deleteUser(id);
+  } catch (e) {
+    deleteError.value =
+      e instanceof Error
+        ? e.message
+        : "Failed to delete user.";
+  } finally {
+    deletingId.value = null;
+  }
+}
 
 const searchQuery = ref(
   typeof route.query.q === "string" ? route.query.q : "",
@@ -125,6 +143,12 @@ onMounted(loadUsers);
         </div>
 
         <div
+          v-if="deleteError"
+          class="alert alert-danger"
+        >
+          {{ deleteError }}
+        </div>
+        <div
           v-if="isLoading"
           class="alert alert-info mb-0"
         >
@@ -183,12 +207,27 @@ onMounted(loadUsers);
                   <td>{{ user.phone }}</td>
 
                   <td>
-                    <RouterLink
-                      :to="`/users/${user.id}`"
-                      class="btn btn-sm btn-outline-secondary"
-                    >
-                      View
-                    </RouterLink>
+                    <div class="d-flex gap-2">
+                      <RouterLink
+                        :to="`/users/${user.id}`"
+                        class="btn btn-sm btn-outline-secondary"
+                      >
+                        View
+                      </RouterLink>
+
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-danger"
+                        :disabled="deletingId === user.id"
+                        @click="deleteUser(user.id)"
+                      >
+                        {{
+                          deletingId === user.id
+                            ? "Deleting..."
+                            : "Delete"
+                        }}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               </tbody>

@@ -15,6 +15,7 @@ export const useUsersStore = defineStore("users", () => {
   const error = ref<string | null>(null);
 
   const loadedKey = ref("");
+  const deletedIds = ref<number[]>([]);
 
   async function loadUsers(
     page: number,
@@ -43,9 +44,11 @@ export const useUsersStore = defineStore("users", () => {
             skip,
           });
 
-      users.value = data.users.map((user) => {
+      users.value = data.users
+    .filter((user) => !deletedIds.value.includes(user.id))
+    .map((user) => {
         return usersById.value[user.id] ?? user;
-      });
+    });
 
       total.value = data.total;
 
@@ -119,9 +122,28 @@ export const useUsersStore = defineStore("users", () => {
     return merged;
   }
 
+  async function deleteUser(id: number): Promise<void> {
+  await ServiceProvider.users.delete(id);
+
+  if (!deletedIds.value.includes(id)) {
+    deletedIds.value.push(id);
+  }
+
+  users.value = users.value.filter(
+    (user) => user.id !== id,
+  );
+
+  delete usersById.value[id];
+
+  if (total.value > 0) {
+    total.value -= 1;
+  }
+}
+
   return {
     users,
     usersById,
+    deletedIds,
     total,
     isLoading,
     error,
@@ -129,5 +151,6 @@ export const useUsersStore = defineStore("users", () => {
     loadUser,
     createUser,
     updateUser,
+    deleteUser,
   };
 });
