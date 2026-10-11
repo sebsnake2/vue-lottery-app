@@ -34,15 +34,15 @@ const router = createRouter({
       },
     },
     {
-  path: "/users/:id",
-  name: "user-details",
-  component: () => import("../views/UserDetailsView.vue"),
-  props: true,
-  meta: {
-    title: "User details",
-    layout: DefaultLayout,
-  },
-  children: [
+      path: "/users/:id",
+      name: "user-details",
+      component: () => import("../views/UserDetailsView.vue"),
+      props: true,
+      meta: {
+        title: "User details",
+        layout: DefaultLayout,
+    },
+      children: [
     {
       path: "edit",
       name: "user-edit",
