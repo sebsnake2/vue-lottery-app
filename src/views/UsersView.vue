@@ -1,18 +1,22 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
+import { storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
-import { ServiceProvider } from "../services/service-provider";
-import type { User } from "../types/user";
+import { useUsersStore } from "../stores/users";
 
 const route = useRoute();
 const router = useRouter();
 
-const limit = 10;
+const usersStore = useUsersStore();
 
-const users = ref<User[]>([]);
-const total = ref(0);
-const isLoading = ref(false);
-const error = ref<string | null>(null);
+const {
+  users,
+  total,
+  isLoading,
+  error,
+} = storeToRefs(usersStore);
+
+const limit = 10;
 
 const searchQuery = ref(
   typeof route.query.q === "string" ? route.query.q : "",
@@ -28,37 +32,12 @@ const totalPages = computed(() =>
   Math.max(1, Math.ceil(total.value / limit)),
 );
 
-const skip = computed(
-  () => (currentPage.value - 1) * limit,
-);
-
 async function loadUsers() {
-  isLoading.value = true;
-  error.value = null;
-
-  try {
-    const query = searchQuery.value.trim();
-
-    const data = query
-      ? await ServiceProvider.users.search(query, {
-          limit,
-          skip: skip.value,
-        })
-      : await ServiceProvider.users.getList({
-          limit,
-          skip: skip.value,
-        });
-
-    users.value = data.users;
-    total.value = data.total;
-  } catch (e) {
-    error.value =
-      e instanceof Error
-        ? e.message
-        : "Failed to load users.";
-  } finally {
-    isLoading.value = false;
-  }
+  await usersStore.loadUsers(
+    currentPage.value,
+    searchQuery.value.trim(),
+    limit,
+  );
 }
 
 function changePage(page: number) {
@@ -118,12 +97,12 @@ onMounted(loadUsers);
         Users
       </h1>
 
-      <button
-        type="button"
+      <RouterLink
+        to="/users/new"
         class="btn btn-info text-white fw-semibold"
       >
         Add user
-      </button>
+      </RouterLink>
     </div>
 
     <div class="card shadow-sm">

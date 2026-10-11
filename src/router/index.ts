@@ -25,24 +25,36 @@ const router = createRouter({
       },
     },
     {
-      path: "/users",
-      name: "users",
-      component: () => import("../views/UsersView.vue"),
-      meta: {
+    path: "/users",
+    name: "users",
+    component: () => import("../views/UsersView.vue"),
+    meta: {
         title: "Users",
         layout: DefaultLayout,
-      },
+        requiresAuth: true,
+    },
     },
     {
-      path: "/users/:id",
-      name: "user-details",
-      component: () => import("../views/UserDetailsView.vue"),
-      props: true,
-      meta: {
-        title: "User details",
+    path: "/users/new",
+    name: "user-create",
+    component: () => import("../views/UserCreateView.vue"),
+    meta: {
+        title: "Add user",
         layout: DefaultLayout,
+        requiresAuth: true,
     },
-      children: [
+    },
+    {
+  path: "/users/:id",
+  name: "user-details",
+  component: () => import("../views/UserDetailsView.vue"),
+  props: true,
+  meta: {
+    title: "User details",
+    layout: DefaultLayout,
+    requiresAuth: true,
+  },
+  children: [
     {
       path: "edit",
       name: "user-edit",
@@ -51,6 +63,7 @@ const router = createRouter({
       meta: {
         title: "Edit user",
         layout: DefaultLayout,
+        requiresAuth: true,
       },
     },
   ],

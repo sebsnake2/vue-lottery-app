@@ -1,24 +1,27 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import { ServiceProvider } from "../services/service-provider";
+import { computed, onMounted, ref } from "vue";
+import { useUsersStore } from "../stores/users";
 import type { User } from "../types/user";
 
 const props = defineProps<{
   id: string;
 }>();
 
-const user = ref<User | null>(null);
+const usersStore = useUsersStore();
+
 const isLoading = ref(false);
 const error = ref<string | null>(null);
+
+const user = computed<User | null>(() => {
+  return usersStore.usersById[Number(props.id)] ?? null;
+});
 
 async function loadUser() {
   isLoading.value = true;
   error.value = null;
 
   try {
-    user.value = await ServiceProvider.users.getById(
-      Number(props.id),
-    );
+    await usersStore.loadUser(Number(props.id));
   } catch (e) {
     error.value =
       e instanceof Error
