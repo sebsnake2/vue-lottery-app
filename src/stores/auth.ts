@@ -5,6 +5,23 @@ import type { AuthUser, LoginDto } from "../types/auth";
 
 const ACCESS_TOKEN_KEY = "accessToken";
 const REFRESH_TOKEN_KEY = "refreshToken";
+const USER_KEY = "authUser";
+
+function getStoredUser(): AuthUser | null {
+  const storedUser = localStorage.getItem(USER_KEY);
+
+  if (!storedUser) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(storedUser) as AuthUser;
+  } catch {
+    localStorage.removeItem(USER_KEY);
+
+    return null;
+  }
+}
 
 export const useAuthStore = defineStore("auth", () => {
   const accessToken = ref<string | null>(
@@ -15,7 +32,10 @@ export const useAuthStore = defineStore("auth", () => {
     localStorage.getItem(REFRESH_TOKEN_KEY),
   );
 
-  const user = ref<AuthUser | null>(null);
+  const user = ref<AuthUser | null>(
+    getStoredUser(),
+  );
+
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
@@ -41,6 +61,15 @@ export const useAuthStore = defineStore("auth", () => {
     );
   }
 
+  function saveUser(authUser: AuthUser) {
+    user.value = authUser;
+
+    localStorage.setItem(
+      USER_KEY,
+      JSON.stringify(authUser),
+    );
+  }
+
   function clearAuth() {
     accessToken.value = null;
     refreshToken.value = null;
@@ -48,6 +77,7 @@ export const useAuthStore = defineStore("auth", () => {
 
     localStorage.removeItem(ACCESS_TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
   }
 
   async function login(data: LoginDto) {
@@ -55,14 +85,15 @@ export const useAuthStore = defineStore("auth", () => {
     error.value = null;
 
     try {
-      const response = await ServiceProvider.auth.login(data);
+      const response =
+        await ServiceProvider.auth.login(data);
 
       saveTokens(
         response.accessToken,
         response.refreshToken,
       );
 
-      user.value = {
+      saveUser({
         id: response.id,
         username: response.username,
         email: response.email,
@@ -70,7 +101,7 @@ export const useAuthStore = defineStore("auth", () => {
         lastName: response.lastName,
         gender: response.gender,
         image: response.image,
-      };
+      });
     } catch (e) {
       clearAuth();
 
@@ -86,23 +117,25 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   async function loadCurrentUser() {
-  if (!accessToken.value) {
-    return;
+    if (!accessToken.value) {
+      return;
+    }
+
+    try {
+      const currentUser =
+        await ServiceProvider.auth.getCurrentUser();
+
+      saveUser(currentUser);
+
+      accessToken.value =
+        localStorage.getItem(ACCESS_TOKEN_KEY);
+
+      refreshToken.value =
+        localStorage.getItem(REFRESH_TOKEN_KEY);
+    } catch {
+      clearAuth();
+    }
   }
-
-  try {
-    user.value =
-      await ServiceProvider.auth.getCurrentUser();
-
-    accessToken.value =
-      localStorage.getItem(ACCESS_TOKEN_KEY);
-
-    refreshToken.value =
-      localStorage.getItem(REFRESH_TOKEN_KEY);
-  } catch {
-    clearAuth();
-  }
-}
 
   function logout() {
     clearAuth();
@@ -119,6 +152,7 @@ export const useAuthStore = defineStore("auth", () => {
     loadCurrentUser,
     logout,
     saveTokens,
+    saveUser,
     clearAuth,
   };
 });
