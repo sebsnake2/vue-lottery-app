@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
-import { useUsersStore } from "../stores/users";
-import type { User } from "../types/user";
+import { useUsersStore } from "../../../stores/users";
+import type { User } from "../../../types/user";
 
 const props = defineProps<{
   id: string;

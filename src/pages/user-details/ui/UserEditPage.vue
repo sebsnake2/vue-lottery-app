@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import UserForm from "../components/UserForm.vue";
-import { useUsersStore } from "../stores/users";
+import UserForm from "../../../components/UserForm.vue";
+import { useUsersStore } from "../../../stores/users";
 import type {
-  CreateUserDto,
   User,
-} from "../types/user";
+  CreateUserDto,
+} from "../../../types/user";
 
 const props = defineProps<{
   id: string;

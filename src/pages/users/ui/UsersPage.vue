@@ -2,7 +2,7 @@
 import { computed, onMounted, ref, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
-import { useUsersStore } from "../stores/users";
+import { useUsersStore } from "../../../stores/users";
 
 const route = useRoute();
 const router = useRouter();

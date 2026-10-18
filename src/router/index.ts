@@ -13,7 +13,7 @@ const router = createRouter({
     {
       path: "/",
       name: "home",
-      component: () => import("../views/HomeView.vue"),
+      component: () => import("../pages/home/ui/HomePage.vue"),
       meta: {
         title: "Home",
         layout: DefaultLayout,
@@ -22,7 +22,7 @@ const router = createRouter({
     {
       path: "/about",
       name: "about",
-      component: () => import("../views/AboutView.vue"),
+      component: () => import("../pages/about/ui/AboutPage.vue"),
       meta: {
         title: "About",
         layout: DefaultLayout,
@@ -31,7 +31,7 @@ const router = createRouter({
     {
     path: "/users",
     name: "users",
-    component: () => import("../views/UsersView.vue"),
+    component: () => import("../pages/users/ui/UsersPage.vue"),
     meta: {
         title: "Users",
         layout: DefaultLayout,
@@ -41,7 +41,7 @@ const router = createRouter({
     {
     path: "/users/new",
     name: "user-create",
-    component: () => import("../views/UserCreateView.vue"),
+    component: () => import("../pages/users/ui/UserCreatePage.vue"),
     meta: {
         title: "Add user",
         layout: DefaultLayout,
@@ -51,7 +51,7 @@ const router = createRouter({
     {
     path: "/users/:id",
     name: "user-details",
-    component: () => import("../views/UserDetailsView.vue"),
+    component: () => import("../pages/user-details/ui/UserDetailsPage.vue"),
     props: true,
     meta: {
         title: "User details",
@@ -62,7 +62,7 @@ const router = createRouter({
         {
         path: "edit",
         name: "user-edit",
-        component: () => import("../views/UserEditView.vue"),
+        component: () => import("../pages/user-details/ui/UserEditPage.vue"),
         props: true,
         meta: {
             title: "Edit user",
@@ -75,7 +75,7 @@ const router = createRouter({
     {
       path: "/login",
       name: "login",
-      component: () => import("../views/LoginView.vue"),
+      component: () => import("../pages/login/ui/LoginPage.vue"),
       meta: {
         title: "Login",
         layout: AuthLayout,
@@ -84,7 +84,7 @@ const router = createRouter({
     {
       path: "/:pathMatch(.*)*",
       name: "not-found",
-      component: () => import("../views/NotFoundView.vue"),
+      component: () => import("../pages/not-found/ui/NotFoundPage.vue"),
       meta: {
         title: "404",
         layout: DefaultLayout,

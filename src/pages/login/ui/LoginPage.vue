@@ -3,7 +3,7 @@ import { computed } from "vue";
 import { useField, useForm } from "vee-validate";
 import { useRoute, useRouter } from "vue-router";
 import * as yup from "yup";
-import { useAuthStore } from "../stores/auth";
+import { useAuthStore } from "../../../stores/auth";
 
 const router = useRouter();
 const route = useRoute();
