@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-import { useAuthStore } from "../../../stores/auth";
+import { useSessionStore } from "@/entities/session";
 
 const router = useRouter();
-const authStore = useAuthStore();
+const sessionStore = useSessionStore();
 
 async function logout() {
-  authStore.logout();
+  sessionStore.logout();
 
   await router.push({
     name: "login",
@@ -25,14 +25,14 @@ async function logout() {
     </RouterLink>
 
     <RouterLink
-      v-if="authStore.isAuthenticated"
+      v-if="sessionStore.isAuthenticated"
       to="/users"
     >
       Users
     </RouterLink>
 
     <RouterLink
-      v-if="!authStore.isAuthenticated"
+      v-if="!sessionStore.isAuthenticated"
       to="/login"
     >
       Login

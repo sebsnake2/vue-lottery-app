@@ -1,18 +1,17 @@
 import { computed, ref } from "vue";
 import { defineStore } from "pinia";
+
+import { ServiceProvider } from "@/shared/api";
+import { AuthService } from "../api/auth.service";
+
 import type {
   AuthUser,
   LoginDto,
-  AuthService,
-} from "@/entities/session";
-
-import { ServiceProvider } from "@/shared/api";
+} from "./types";
 
 const ACCESS_TOKEN_KEY = "accessToken";
 const REFRESH_TOKEN_KEY = "refreshToken";
 const USER_KEY = "authUser";
-const service = () =>
-  ServiceProvider.get<AuthService>("auth");
 
 function getStoredUser(): AuthUser | null {
   const storedUser = localStorage.getItem(USER_KEY);
@@ -30,7 +29,7 @@ function getStoredUser(): AuthUser | null {
   }
 }
 
-export const useAuthStore = defineStore("auth", () => {
+export const useSessionStore = defineStore("session", () => {
   const accessToken = ref<string | null>(
     localStorage.getItem(ACCESS_TOKEN_KEY),
   );
@@ -49,6 +48,9 @@ export const useAuthStore = defineStore("auth", () => {
   const isAuthenticated = computed(
     () => Boolean(accessToken.value),
   );
+
+  const service = () =>
+    ServiceProvider.get<AuthService>("auth");
 
   function saveTokens(
     newAccessToken: string,
@@ -77,7 +79,7 @@ export const useAuthStore = defineStore("auth", () => {
     );
   }
 
-  function clearAuth() {
+  function clearSession() {
     accessToken.value = null;
     refreshToken.value = null;
     user.value = null;
@@ -92,8 +94,7 @@ export const useAuthStore = defineStore("auth", () => {
     error.value = null;
 
     try {
-      const response =
-        await service().login(data);
+      const response = await service().login(data);
 
       saveTokens(
         response.accessToken,
@@ -110,7 +111,7 @@ export const useAuthStore = defineStore("auth", () => {
         image: response.image,
       });
     } catch (e) {
-      clearAuth();
+      clearSession();
 
       error.value =
         e instanceof Error
@@ -140,12 +141,12 @@ export const useAuthStore = defineStore("auth", () => {
       refreshToken.value =
         localStorage.getItem(REFRESH_TOKEN_KEY);
     } catch {
-      clearAuth();
+      clearSession();
     }
   }
 
   function logout() {
-    clearAuth();
+    clearSession();
   }
 
   return {
@@ -160,6 +161,6 @@ export const useAuthStore = defineStore("auth", () => {
     logout,
     saveTokens,
     saveUser,
-    clearAuth,
+    clearSession,
   };
 });

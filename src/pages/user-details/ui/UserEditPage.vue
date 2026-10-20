@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import UserForm from "../../../components/UserForm.vue";
-import { useUsersStore } from "../../../stores/users";
+import { useUsersStore } from "../../../entities/user/model/users.store.ts";
 
 import type {
   User,

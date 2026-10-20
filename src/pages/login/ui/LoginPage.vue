@@ -3,11 +3,11 @@ import { computed } from "vue";
 import { useField, useForm } from "vee-validate";
 import { useRoute, useRouter } from "vue-router";
 import * as yup from "yup";
-import { useAuthStore } from "../../../stores/auth";
+import { useSessionStore } from "@/entities/session";
 
 const router = useRouter();
 const route = useRoute();
-const authStore = useAuthStore();
+const sessionStore = useSessionStore();
 
 const schema = yup.object({
   username: yup
@@ -35,12 +35,12 @@ const {
 } = useField<string>("password");
 
 const loginError = computed(
-  () => authStore.error,
+  () => sessionStore.error,
 );
 
 const submitLogin = handleSubmit(async (values) => {
   try {
-    await authStore.login({
+    await sessionStore.login({
       username: values.username,
       password: values.password,
     });
@@ -117,10 +117,10 @@ const submitLogin = handleSubmit(async (values) => {
         <button
           type="submit"
           class="btn btn-info text-white w-100"
-          :disabled="authStore.isLoading"
+          :disabled="sessionStore.isLoading"
         >
           {{
-            authStore.isLoading
+            sessionStore.isLoading
               ? "Logging in..."
               : "Login"
           }}

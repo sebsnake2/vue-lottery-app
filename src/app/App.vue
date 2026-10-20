@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
+
 import DefaultLayout from "../layouts/DefaultLayout.vue";
-import { onMounted } from "vue";
-import { useAuthStore } from "../stores/auth";
+import { useSessionStore } from "@/entities/session";
 
 const route = useRoute();
-const authStore = useAuthStore();
+const sessionStore = useSessionStore();
 
 onMounted(() => {
-  authStore.loadCurrentUser();
+  sessionStore.loadCurrentUser();
 });
 
 const layout = computed(
