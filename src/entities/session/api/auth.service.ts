@@ -1,10 +1,11 @@
-import { http } from "../api/http-client";
+import { http } from "@/shared/api";
+
 import type {
   AuthUser,
   LoginDto,
   LoginResponse,
   RefreshResponse,
-} from "../types/auth";
+} from "../model/types";
 
 export class AuthService {
   login(data: LoginDto): Promise<LoginResponse> {

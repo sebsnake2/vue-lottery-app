@@ -1,11 +1,14 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { ServiceProvider } from "../services/service-provider";
+
 import type {
+  User,
   CreateUserDto,
   UpdateUserDto,
-  User,
-} from "../types/user";
+  UserService,
+} from "@/entities/user";
+
+import { ServiceProvider } from "@/shared/api";
 
 export const useUsersStore = defineStore("users", () => {
   const users = ref<User[]>([]);
@@ -17,6 +20,9 @@ export const useUsersStore = defineStore("users", () => {
   const loadedKey = ref("");
   const deletedIds = ref<number[]>([]);
 
+  const service = () =>
+    ServiceProvider.get<UserService>("users");
+
   async function loadUsers(
     page: number,
     query: string,
@@ -24,7 +30,10 @@ export const useUsersStore = defineStore("users", () => {
   ) {
     const key = `${page}:${query}`;
 
-    if (loadedKey.value === key && users.value.length > 0) {
+    if (
+      loadedKey.value === key &&
+      users.value.length > 0
+    ) {
       return;
     }
 
@@ -35,20 +44,23 @@ export const useUsersStore = defineStore("users", () => {
       const skip = (page - 1) * limit;
 
       const data = query
-        ? await ServiceProvider.users.search(query, {
+        ? await service().search(query, {
             limit,
             skip,
           })
-        : await ServiceProvider.users.getList({
+        : await service().getList({
             limit,
             skip,
           });
 
       users.value = data.users
-    .filter((user) => !deletedIds.value.includes(user.id))
-    .map((user) => {
-        return usersById.value[user.id] ?? user;
-    });
+        .filter(
+          (user) =>
+            !deletedIds.value.includes(user.id),
+        )
+        .map((user) => {
+          return usersById.value[user.id] ?? user;
+        });
 
       total.value = data.total;
 
@@ -74,7 +86,7 @@ export const useUsersStore = defineStore("users", () => {
       return cached;
     }
 
-    const user = await ServiceProvider.users.getById(id);
+    const user = await service().getById(id);
 
     usersById.value[id] = user;
 
@@ -84,7 +96,7 @@ export const useUsersStore = defineStore("users", () => {
   async function createUser(
     data: CreateUserDto,
   ): Promise<User> {
-    const created = await ServiceProvider.users.create(data);
+    const created = await service().create(data);
 
     usersById.value[created.id] = created;
     users.value = [created, ...users.value];
@@ -98,7 +110,7 @@ export const useUsersStore = defineStore("users", () => {
     id: number,
     data: UpdateUserDto,
   ): Promise<User> {
-    const updated = await ServiceProvider.users.update(id, data);
+    const updated = await service().update(id, data);
 
     const current =
       usersById.value[id] ??
@@ -123,22 +135,22 @@ export const useUsersStore = defineStore("users", () => {
   }
 
   async function deleteUser(id: number): Promise<void> {
-  await ServiceProvider.users.delete(id);
+    await service().delete(id);
 
-  if (!deletedIds.value.includes(id)) {
-    deletedIds.value.push(id);
+    if (!deletedIds.value.includes(id)) {
+      deletedIds.value.push(id);
+    }
+
+    users.value = users.value.filter(
+      (user) => user.id !== id,
+    );
+
+    delete usersById.value[id];
+
+    if (total.value > 0) {
+      total.value -= 1;
+    }
   }
-
-  users.value = users.value.filter(
-    (user) => user.id !== id,
-  );
-
-  delete usersById.value[id];
-
-  if (total.value > 0) {
-    total.value -= 1;
-  }
-}
 
   return {
     users,

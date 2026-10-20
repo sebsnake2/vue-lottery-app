@@ -1,16 +1,23 @@
-import { http } from "../api/http-client";
+import {
+  http,
+  type Readable,
+  type Creatable,
+  type Editable,
+  type Deletable,
+} from "@/shared/api";
+
 import type {
   User,
-  UsersResponse,
   CreateUserDto,
   UpdateUserDto,
-} from "../types/user";
-import type {
-  Readable,
-  Creatable,
-  Editable,
-  Deletable,
-} from "./interfaces";
+} from "../model/types";
+
+interface UsersResponse {
+  users: User[];
+  total: number;
+  skip: number;
+  limit: number;
+}
 
 export class UserService
   implements

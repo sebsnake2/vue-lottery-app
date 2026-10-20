@@ -3,10 +3,11 @@ import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import UserForm from "../../../components/UserForm.vue";
 import { useUsersStore } from "../../../stores/users";
+
 import type {
   User,
   CreateUserDto,
-} from "../../../types/user";
+} from "@/entities/user";
 
 const props = defineProps<{
   id: string;

@@ -3,7 +3,8 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import UserForm from "../../../components/UserForm.vue";
 import { useUsersStore } from "../../../stores/users";
-import type { CreateUserDto } from "../../../types/user";
+
+import type { CreateUserDto } from "@/entities/user";
 
 const router = useRouter();
 const usersStore = useUsersStore();

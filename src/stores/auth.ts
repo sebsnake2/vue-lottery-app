@@ -1,11 +1,18 @@
 import { computed, ref } from "vue";
 import { defineStore } from "pinia";
-import { ServiceProvider } from "../services/service-provider";
-import type { AuthUser, LoginDto } from "../types/auth";
+import type {
+  AuthUser,
+  LoginDto,
+  AuthService,
+} from "@/entities/session";
+
+import { ServiceProvider } from "@/shared/api";
 
 const ACCESS_TOKEN_KEY = "accessToken";
 const REFRESH_TOKEN_KEY = "refreshToken";
 const USER_KEY = "authUser";
+const service = () =>
+  ServiceProvider.get<AuthService>("auth");
 
 function getStoredUser(): AuthUser | null {
   const storedUser = localStorage.getItem(USER_KEY);
@@ -86,7 +93,7 @@ export const useAuthStore = defineStore("auth", () => {
 
     try {
       const response =
-        await ServiceProvider.auth.login(data);
+        await service().login(data);
 
       saveTokens(
         response.accessToken,
@@ -123,7 +130,7 @@ export const useAuthStore = defineStore("auth", () => {
 
     try {
       const currentUser =
-        await ServiceProvider.auth.getCurrentUser();
+        await service().getCurrentUser();
 
       saveUser(currentUser);
 
