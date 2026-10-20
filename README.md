@@ -1,182 +1,234 @@
 # Vue Lottery App
 
-Laboratory work for the **Client Web Systems** course.
+Vue 3 application developed for the Client Web Systems course.
 
-The project is built with Vue 3, TypeScript and Composition API and demonstrates routing, reusable components, repository pattern, REST API integration, authentication, Pinia state management, form validation and protected routes.
+The project was refactored using **Feature-Sliced Design (FSD)** and includes routing, authentication, user management, REST API integration, Pinia state management, reusable UI components and light/dark themes.
+
+## Demo
+
+GitHub Pages:
+
+https://sebsnake2.github.io/vue-lottery-app/
+
+## Repository
+
+https://github.com/sebsnake2/vue-lottery-app
 
 ## Technologies
 
 - Vue 3
 - TypeScript
 - Composition API
+- Vite
 - Vue Router
 - Pinia
+- pinia-plugin-persistedstate
+- PrimeVue
 - VeeValidate
 - Yup
 - SCSS
 - Bootstrap
-- Vite
+- REST API
+- Feature-Sliced Design
+- Steiger
 - ESLint
-- DummyJSON REST API
 
 ## Features
 
-### Routing
-
-The application uses Vue Router and includes:
-
-- Home page
-- About page
-- Users page
-- Login page
-- 404 page
-- Dynamic user route `/users/:id`
-- Nested user edit route `/users/:id/edit`
-- User creation route `/users/new`
-- Lazy-loaded route components
-- Active navigation links
-- Page titles using route `meta`
-- Protected routes using navigation guards
-- Separate default and authentication layouts
-
-## Users
-
-User data is loaded from DummyJSON through a repository/service layer.
-
-Implemented functionality:
-
-- Users table
-- User avatars
-- Search by name
-- 300 ms search debounce
-- Pagination using `limit` and `skip`
-- Search and page state stored in URL query parameters
+- Client-side routing with Vue Router
+- Lazy-loaded pages
+- Authentication using JWT
+- Protected routes with navigation guards
+- User list from DummyJSON
+- User search
+- Pagination using query parameters
 - User details page
-- User creation
-- User editing
-- User deletion
-- Local state updates after simulated DummyJSON mutations
+- Create user
+- Edit user
+- Delete user with confirmation dialog
+- Repository pattern for API access
+- Pinia stores for application state
+- Reusable UI wrappers
+- Form validation with VeeValidate and Yup
+- Light and dark themes
+- Persisted theme state
+- 404 page
+- Dynamic browser page titles
 
-Because DummyJSON simulates POST, PUT and DELETE requests without permanently changing server data, created, edited and deleted users are updated locally in Pinia state.
+## Feature-Sliced Design
 
-## Repository Pattern
+The application follows the Feature-Sliced Design architecture.
 
-API access is separated from Vue components.
+```text
+src/
+├── app/
+│   ├── providers/
+│   ├── styles/
+│   └── App.vue
+│
+├── pages/
+│   ├── home/
+│   ├── about/
+│   ├── users/
+│   ├── user-details/
+│   ├── login/
+│   └── not-found/
+│
+├── widgets/
+│   ├── app-header/
+│   └── users-table/
+│
+├── features/
+│   ├── auth/
+│   └── user-form/
+│
+├── entities/
+│   ├── user/
+│   ├── session/
+│   └── setting/
+│
+└── shared/
+    ├── api/
+    └── ui/
+```
 
-The project contains:
+### Layer responsibilities
 
-- generic `Readable<T>` interface
-- generic `Creatable<T, TCreate>` interface
-- generic `Editable<T, TUpdate>` interface
-- `Deletable` interface
+- **app** — application initialization, providers, router integration and global styles.
+- **pages** — application pages corresponding to routes.
+- **widgets** — large independent UI blocks such as the application header and users table.
+- **features** — user actions such as authentication and user forms.
+- **entities** — business entities, stores, types and API services.
+- **shared** — reusable API infrastructure and UI components.
+
+## Architecture diagram
+
+```mermaid
+flowchart TD
+    App[app]
+
+    Pages[pages]
+    Widgets[widgets]
+    Features[features]
+    Entities[entities]
+    Shared[shared]
+
+    App --> Pages
+    App --> Widgets
+    App --> Features
+    App --> Entities
+    App --> Shared
+
+    Pages --> Widgets
+    Pages --> Features
+    Pages --> Entities
+    Pages --> Shared
+
+    Widgets --> Features
+    Widgets --> Entities
+    Widgets --> Shared
+
+    Features --> Entities
+    Features --> Shared
+
+    Entities --> Shared
+```
+
+Dependencies follow the FSD rule: higher layers may depend only on lower layers.
+
+## Repository pattern
+
+API access is separated from application UI using the Repository pattern.
+
+The application contains:
+
+- shared HTTP client
+- generic repository interfaces
 - `UserService`
 - `AuthService`
-- `ServiceProvider`
-- reusable HTTP client
+- universal `ServiceProvider`
 
-Components do not call `fetch()` directly.
+Components and pages do not communicate with the REST API directly. They use Pinia stores and entity services.
 
-## Authentication
+## State management
 
-Authentication is implemented using DummyJSON authentication endpoints.
+Pinia is used for centralized application state.
 
-Features:
+Main stores:
 
-- Login through `/auth/login`
-- Current user loading through `/auth/me`
-- `accessToken`
-- `refreshToken`
-- Tokens stored in Pinia and `localStorage`
-- Authenticated user stored in Pinia and `localStorage`
-- `Authorization: Bearer <token>` header
-- Automatic token refresh through `/auth/refresh` after HTTP 401
-- Automatic retry of the original request after successful refresh
-- Protected `/users` routes
-- Redirect back to the requested page after login
-- Logout
-- Authenticated users are redirected away from `/login`
+- `useUsersStore` — user list, user details, loading state and CRUD operations.
+- `useSessionStore` — authentication state and tokens.
+- `useSettingsStore` — application theme.
 
-## Forms and Validation
+`pinia-plugin-persistedstate` is used to persist application settings.
 
-User create/edit and login forms use VeeValidate with Yup.
+## UI library
 
-Validation includes:
+PrimeVue is used through reusable wrappers located in `shared/ui`:
 
-- required fields
-- valid email
-- minimum password length
-- numeric age validation
-- validation messages displayed directly in the form
+- `AppButton`
+- `AppInput`
+- `AppTable`
+- `AppConfirmDialog`
 
-User form fields:
+Application pages and features use these wrappers instead of importing PrimeVue components directly.
 
-- First name
-- Last name
-- Email
-- Username
-- Password
-- Age
-- Gender
-- Phone
+## API
 
-## Environment Variables
+The project uses the public DummyJSON REST API.
 
-The API URL is stored in an environment variable:
+API URL is stored in the environment configuration:
 
 ```env
 VITE_API_URL=https://dummyjson.com
+```
 
-Create a local .env file based on:
-.env.example
+The `.env` file is not committed to the repository.
 
-The real .env file is ignored by Git.
-Project Structure
-src/
-├── api/
-│   └── http-client.ts
-├── assets/
-├── components/
-├── layouts/
-├── router/
-│   └── index.ts
-├── services/
-│   ├── auth.service.ts
-│   ├── interfaces.ts
-│   ├── service-provider.ts
-│   └── user.service.ts
-├── stores/
-│   ├── auth.ts
-│   └── users.ts
-├── types/
-├── views/
-├── App.vue
-└── main.ts
+Use `.env.example` as an example.
 
-Installation
-Install dependencies:
+## Installation
+
+```bash
 npm install
+```
 
-Create .env in the project root:
+Create `.env`:
+
+```env
 VITE_API_URL=https://dummyjson.com
+```
 
 Run the development server:
+
+```bash
 npm run dev
+```
 
-Code Quality
-Run ESLint:
-npm run lint
+## Build
 
-Create a production build:
+```bash
 npm run build
+```
 
-Preview the production build:
-npm run preview
+## Lint
 
-Test Account
-DummyJSON test account:
-Username: emilys
-Password: emilyspass
+ESLint:
 
-Author
+```bash
+npm run lint
+```
+
+FSD architecture validation:
+
+```bash
+npm run lint:fsd
+```
+
+## Author
+
 Sebastian Burla
-GitHub: sebsnake2
+
+Information Technology student at Yuriy Fedkovych Chernivtsi National University.
+
+GitHub: https://github.com/sebsnake2
