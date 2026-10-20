@@ -2,9 +2,10 @@
 import { computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 
-import DefaultLayout from "../layouts/DefaultLayout.vue";
+import DefaultLayout from "@/app/layouts/DefaultLayout.vue";
 import { useSessionStore } from "@/entities/session";
 import { useSettingsStore } from "@/entities/setting";
+import { AppToast } from "@/shared/ui";
 
 const route = useRoute();
 const sessionStore = useSessionStore();
@@ -21,6 +22,8 @@ const layout = computed(
 </script>
 
 <template>
+  <AppToast />
+
   <component :is="layout">
     <RouterView />
   </component>

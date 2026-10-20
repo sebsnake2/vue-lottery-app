@@ -39,7 +39,7 @@ const totalPages = computed(() =>
 );
 
 async function loadUsers() {
-  await usersStore.loadUsers(
+  await usersStore.fetchUsers(
     currentPage.value,
     searchQuery.value.trim(),
     limit,

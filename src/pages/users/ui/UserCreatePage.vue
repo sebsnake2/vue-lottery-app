@@ -5,8 +5,10 @@ import { UserForm } from "@/features/user-form";
 import { useUsersStore } from "@/entities/user";
 
 import type { CreateUserDto } from "@/entities/user";
+import { useToast } from "primevue/usetoast";
 
 const router = useRouter();
+const toast = useToast();
 const usersStore = useUsersStore();
 
 const isSaving = ref(false);
@@ -19,6 +21,13 @@ async function createUser(data: CreateUserDto) {
   try {
     await usersStore.createUser(data);
 
+    toast.add({
+  severity: "success",
+  summary: "User created",
+  detail: "The user was created successfully.",
+  life: 3000,
+});
+
     await router.push({
       name: "users",
       query: {
@@ -30,6 +39,13 @@ async function createUser(data: CreateUserDto) {
       e instanceof Error
         ? e.message
         : "Failed to create user.";
+
+        toast.add({
+  severity: "error",
+  summary: "Create failed",
+  detail: error.value ?? "Failed to create user.",
+  life: 4000,
+});
   } finally {
     isSaving.value = false;
   }

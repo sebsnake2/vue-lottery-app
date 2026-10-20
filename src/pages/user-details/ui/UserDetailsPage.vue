@@ -21,7 +21,7 @@ async function loadUser() {
   error.value = null;
 
   try {
-    await usersStore.loadUser(Number(props.id));
+    await usersStore.fetchUser(Number(props.id));
   } catch (e) {
     error.value =
       e instanceof Error

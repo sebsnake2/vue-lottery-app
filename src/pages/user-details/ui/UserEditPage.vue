@@ -3,12 +3,14 @@ import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { UserForm } from "@/features/user-form";
 import { useUsersStore } from "@/entities/user";
+import { useToast } from "primevue/usetoast";
 
 import type {
   User,
   CreateUserDto,
 } from "@/entities/user";
 
+const toast = useToast();
 const props = defineProps<{
   id: string;
 }>();
@@ -46,7 +48,7 @@ async function loadUser() {
   error.value = null;
 
   try {
-    await usersStore.loadUser(Number(props.id));
+    await usersStore.fetchUser(Number(props.id));
   } catch (e) {
     error.value =
       e instanceof Error
@@ -67,6 +69,13 @@ async function updateUser(data: CreateUserDto) {
       data,
     );
 
+    toast.add({
+      severity: "success",
+      summary: "User updated",
+      detail: "The user was updated successfully.",
+      life: 3000,
+    });
+
     await router.push({
       name: "user-details",
       params: {
@@ -78,6 +87,14 @@ async function updateUser(data: CreateUserDto) {
       e instanceof Error
         ? e.message
         : "Failed to update user.";
+
+    toast.add({
+      severity: "error",
+      summary: "Update failed",
+      detail:
+        error.value ?? "Failed to update user.",
+      life: 4000,
+    });
   } finally {
     isSaving.value = false;
   }

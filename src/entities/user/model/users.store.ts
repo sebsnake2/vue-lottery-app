@@ -23,7 +23,7 @@ export const useUsersStore = defineStore("users", () => {
   const service = () =>
     ServiceProvider.get<UserService>("users");
 
-  async function loadUsers(
+  async function fetchUsers(
     page: number,
     query: string,
     limit = 10,
@@ -79,7 +79,7 @@ export const useUsersStore = defineStore("users", () => {
     }
   }
 
-  async function loadUser(id: number): Promise<User> {
+  async function fetchUser(id: number): Promise<User> {
     const cached = usersById.value[id];
 
     if (cached) {
@@ -134,7 +134,7 @@ export const useUsersStore = defineStore("users", () => {
     return merged;
   }
 
-  async function deleteUser(id: number): Promise<void> {
+  async function removeUser(id: number): Promise<void> {
     await service().delete(id);
 
     if (!deletedIds.value.includes(id)) {
@@ -159,10 +159,10 @@ export const useUsersStore = defineStore("users", () => {
     total,
     isLoading,
     error,
-    loadUsers,
-    loadUser,
+    fetchUsers,
+    fetchUser,
     createUser,
     updateUser,
-    deleteUser,
+    removeUser,
   };
 });

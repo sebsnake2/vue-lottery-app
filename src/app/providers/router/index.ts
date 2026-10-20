@@ -2,8 +2,8 @@ import {
   createRouter,
   createWebHashHistory,
 } from "vue-router";
-import DefaultLayout from "../layouts/DefaultLayout.vue";
-import AuthLayout from "../layouts/AuthLayout.vue";
+import DefaultLayout from "@/app/layouts/DefaultLayout.vue";
+import AuthLayout from "@/app/layouts/AuthLayout.vue";
 import { useSessionStore } from "@/entities/session";
 
 const router = createRouter({
@@ -13,7 +13,7 @@ const router = createRouter({
     {
       path: "/",
       name: "home",
-      component: () => import("../pages/home/ui/HomePage.vue"),
+      component: () => import("@/pages/home/ui/HomePage.vue"),
       meta: {
         title: "Home",
         layout: DefaultLayout,
@@ -22,7 +22,7 @@ const router = createRouter({
     {
       path: "/about",
       name: "about",
-      component: () => import("../pages/about/ui/AboutPage.vue"),
+      component: () => import("@/pages/about/ui/AboutPage.vue"),
       meta: {
         title: "About",
         layout: DefaultLayout,
@@ -31,7 +31,7 @@ const router = createRouter({
     {
     path: "/users",
     name: "users",
-    component: () => import("../pages/users/ui/UsersPage.vue"),
+    component: () => import("@/pages/users/ui/UsersPage.vue"),
     meta: {
         title: "Users",
         layout: DefaultLayout,
@@ -41,7 +41,7 @@ const router = createRouter({
     {
     path: "/users/new",
     name: "user-create",
-    component: () => import("../pages/users/ui/UserCreatePage.vue"),
+    component: () => import("@/pages/users/ui/UserCreatePage.vue"),
     meta: {
         title: "Add user",
         layout: DefaultLayout,
@@ -51,7 +51,7 @@ const router = createRouter({
     {
     path: "/users/:id",
     name: "user-details",
-    component: () => import("../pages/user-details/ui/UserDetailsPage.vue"),
+    component: () => import("@/pages/user-details/ui/UserDetailsPage.vue"),
     props: true,
     meta: {
         title: "User details",
@@ -62,7 +62,7 @@ const router = createRouter({
         {
         path: "edit",
         name: "user-edit",
-        component: () => import("../pages/user-details/ui/UserEditPage.vue"),
+        component: () => import("@/pages/user-details/ui/UserEditPage.vue"),
         props: true,
         meta: {
             title: "Edit user",
@@ -75,7 +75,7 @@ const router = createRouter({
     {
       path: "/login",
       name: "login",
-      component: () => import("../pages/login/ui/LoginPage.vue"),
+      component: () => import("@/pages/login/ui/LoginPage.vue"),
       meta: {
         title: "Login",
         layout: AuthLayout,
@@ -84,7 +84,7 @@ const router = createRouter({
     {
       path: "/:pathMatch(.*)*",
       name: "not-found",
-      component: () => import("../pages/not-found/ui/NotFoundPage.vue"),
+      component: () => import("@/pages/not-found/ui/NotFoundPage.vue"),
       meta: {
         title: "404",
         layout: DefaultLayout,

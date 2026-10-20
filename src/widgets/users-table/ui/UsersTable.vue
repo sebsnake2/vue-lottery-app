@@ -2,11 +2,12 @@
 import { ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useConfirm } from "primevue/useconfirm";
-import Column from "primevue/column";
+import { useToast } from "primevue/usetoast";
 
 import { useUsersStore } from "@/entities/user";
 import {
   AppButton,
+  AppColumn,
   AppConfirmDialog,
   AppTable,
 } from "@/shared/ui";
@@ -15,6 +16,7 @@ const usersStore = useUsersStore();
 const { users, isLoading } = storeToRefs(usersStore);
 
 const confirm = useConfirm();
+const toast = useToast();
 
 const deletingId = ref<number | null>(null);
 const deleteError = ref<string | null>(null);
@@ -32,12 +34,28 @@ function confirmDelete(id: number) {
       deleteError.value = null;
 
       try {
-        await usersStore.deleteUser(id);
+        await usersStore.removeUser(id);
+
+        toast.add({
+          severity: "success",
+          summary: "User deleted",
+          detail: "The user was deleted successfully.",
+          life: 3000,
+        });
       } catch (e) {
         deleteError.value =
           e instanceof Error
             ? e.message
             : "Failed to delete user.";
+
+        toast.add({
+          severity: "error",
+          summary: "Delete failed",
+          detail:
+            deleteError.value ??
+            "Failed to delete user.",
+          life: 4000,
+        });
       } finally {
         deletingId.value = null;
       }
@@ -60,12 +78,12 @@ function confirmDelete(id: number) {
     :value="users"
     :loading="isLoading"
   >
-    <Column
+    <AppColumn
       field="id"
       header="#"
     />
 
-    <Column header="User">
+    <AppColumn header="User">
       <template #body="{ data }">
         <div class="d-flex align-items-center gap-2">
           <img
@@ -80,34 +98,34 @@ function confirmDelete(id: number) {
           </span>
         </div>
       </template>
-    </Column>
+    </AppColumn>
 
-    <Column
+    <AppColumn
       field="email"
       header="Email"
     />
 
-    <Column
+    <AppColumn
       field="username"
       header="Username"
     />
 
-    <Column
+    <AppColumn
       field="age"
       header="Age"
     />
 
-    <Column
+    <AppColumn
       field="gender"
       header="Gender"
     />
 
-    <Column
+    <AppColumn
       field="phone"
       header="Phone"
     />
 
-    <Column header="Actions">
+    <AppColumn header="Actions">
       <template #body="{ data }">
         <div class="d-flex gap-2">
           <RouterLink
@@ -127,7 +145,7 @@ function confirmDelete(id: number) {
           />
         </div>
       </template>
-    </Column>
+    </AppColumn>
   </AppTable>
 
   <div

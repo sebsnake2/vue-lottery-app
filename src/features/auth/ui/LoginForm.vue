@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useField, useForm } from "vee-validate";
+import { useToast } from "primevue/usetoast";
 import * as yup from "yup";
 
 import { useSessionStore } from "@/entities/session";
@@ -14,6 +15,7 @@ const emit = defineEmits<{
 }>();
 
 const sessionStore = useSessionStore();
+const toast = useToast();
 
 const schema = yup.object({
   username: yup
@@ -53,7 +55,12 @@ const submitLogin = handleSubmit(async (values) => {
 
     emit("success");
   } catch {
-    // Error is stored in sessionStore.
+    toast.add({
+      severity: "error",
+      summary: "Login failed",
+      detail: "Invalid username or password.",
+      life: 4000,
+    });
   }
 });
 </script>
