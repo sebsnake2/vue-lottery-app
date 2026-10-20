@@ -9,6 +9,9 @@ export function setupUi(app: App): void {
   app.use(PrimeVue, {
     theme: {
       preset: Aura,
+      options: {
+      darkModeSelector: false,
+    },
     },
   });
 

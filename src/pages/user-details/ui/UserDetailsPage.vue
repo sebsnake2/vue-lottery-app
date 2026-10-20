@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
-import { useUsersStore } from "../../../entities/user/model/users.store";
+import { useUsersStore } from "@/entities/user";
 import type { User } from "@/entities/user";
 
 const props = defineProps<{

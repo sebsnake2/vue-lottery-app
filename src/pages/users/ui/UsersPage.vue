@@ -2,7 +2,10 @@
 import { computed, onMounted, ref, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
-import { useUsersStore } from "../../../entities/user/model/users.store";
+
+import { useUsersStore } from "@/entities/user";
+import { AppButton, AppInput } from "@/shared/ui";
+import { UsersTable } from "@/widgets/users-table";
 
 const route = useRoute();
 const router = useRouter();
@@ -10,40 +13,25 @@ const router = useRouter();
 const usersStore = useUsersStore();
 
 const {
-  users,
   total,
   isLoading,
   error,
 } = storeToRefs(usersStore);
 
 const limit = 10;
-const deletingId = ref<number | null>(null);
-const deleteError = ref<string | null>(null);
-
-async function deleteUser(id: number) {
-  deletingId.value = id;
-  deleteError.value = null;
-
-  try {
-    await usersStore.deleteUser(id);
-  } catch (e) {
-    deleteError.value =
-      e instanceof Error
-        ? e.message
-        : "Failed to delete user.";
-  } finally {
-    deletingId.value = null;
-  }
-}
 
 const searchQuery = ref(
-  typeof route.query.q === "string" ? route.query.q : "",
+  typeof route.query.q === "string"
+    ? route.query.q
+    : "",
 );
 
 const currentPage = computed(() => {
   const page = Number(route.query.page);
 
-  return Number.isInteger(page) && page > 0 ? page : 1;
+  return Number.isInteger(page) && page > 0
+    ? page
+    : 1;
 });
 
 const totalPages = computed(() =>
@@ -72,7 +60,12 @@ function changePage(page: number) {
   });
 }
 
-let searchTimer: ReturnType<typeof setTimeout> | null = null;
+function openCreateUser() {
+  router.push("/users/new");
+}
+
+let searchTimer: ReturnType<typeof setTimeout> | null =
+  null;
 
 watch(searchQuery, (value) => {
   if (searchTimer) {
@@ -110,17 +103,18 @@ onMounted(loadUsers);
 
 <template>
   <section>
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div
+      class="d-flex justify-content-between align-items-center mb-4"
+    >
       <h1 class="mb-0">
         Users
       </h1>
 
-      <RouterLink
-        to="/users/new"
-        class="btn btn-info text-white fw-semibold"
-      >
-        Add user
-      </RouterLink>
+      <AppButton
+        label="Add user"
+        severity="info"
+        @click="openCreateUser"
+      />
     </div>
 
     <div class="card shadow-sm">
@@ -133,153 +127,55 @@ onMounted(loadUsers);
             Search users
           </label>
 
-          <input
+          <AppInput
             id="user-search"
             v-model="searchQuery"
             type="search"
-            class="form-control"
             placeholder="Search by name..."
-          >
+          />
         </div>
 
         <div
-          v-if="deleteError"
+          v-if="error"
           class="alert alert-danger"
-        >
-          {{ deleteError }}
-        </div>
-        <div
-          v-if="isLoading"
-          class="alert alert-info mb-0"
-        >
-          Loading users...
-        </div>
-
-        <div
-          v-else-if="error"
-          class="alert alert-danger mb-0"
         >
           {{ error }}
         </div>
 
-        <template v-else>
-          <div class="table-responsive">
-            <table class="table align-middle">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>User</th>
-                  <th>Email</th>
-                  <th>Username</th>
-                  <th>Age</th>
-                  <th>Gender</th>
-                  <th>Phone</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
+        <UsersTable />
 
-              <tbody>
-                <tr
-                  v-for="user in users"
-                  :key="user.id"
-                >
-                  <td>{{ user.id }}</td>
+        <div
+          v-if="totalPages > 1"
+          class="d-flex justify-content-between align-items-center mt-3"
+        >
+          <span class="text-secondary">
+            Page {{ currentPage }} of {{ totalPages }}
+          </span>
 
-                  <td>
-                    <div class="d-flex align-items-center gap-2">
-                      <img
-                        :src="user.image"
-                        :alt="`${user.firstName} ${user.lastName}`"
-                        class="user-avatar"
-                      >
+          <div class="d-flex gap-2">
+            <AppButton
+              label="Previous"
+              severity="secondary"
+              :outlined="true"
+              :disabled="
+                currentPage === 1 || isLoading
+              "
+              @click="changePage(currentPage - 1)"
+            />
 
-                      <span>
-                        {{ user.firstName }}
-                        {{ user.lastName }}
-                      </span>
-                    </div>
-                  </td>
-
-                  <td>{{ user.email }}</td>
-                  <td>{{ user.username }}</td>
-                  <td>{{ user.age }}</td>
-                  <td>{{ user.gender }}</td>
-                  <td>{{ user.phone }}</td>
-
-                  <td>
-                    <div class="d-flex gap-2">
-                      <RouterLink
-                        :to="`/users/${user.id}`"
-                        class="btn btn-sm btn-outline-secondary"
-                      >
-                        View
-                      </RouterLink>
-
-                      <button
-                        type="button"
-                        class="btn btn-sm btn-outline-danger"
-                        :disabled="deletingId === user.id"
-                        @click="deleteUser(user.id)"
-                      >
-                        {{
-                          deletingId === user.id
-                            ? "Deleting..."
-                            : "Delete"
-                        }}
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <AppButton
+              label="Next"
+              severity="secondary"
+              :outlined="true"
+              :disabled="
+                currentPage === totalPages ||
+                  isLoading
+              "
+              @click="changePage(currentPage + 1)"
+            />
           </div>
-
-          <div
-            v-if="users.length === 0"
-            class="text-secondary text-center py-4"
-          >
-            No users found.
-          </div>
-
-          <div
-            v-if="totalPages > 1"
-            class="d-flex justify-content-between align-items-center mt-3"
-          >
-            <span class="text-secondary">
-              Page {{ currentPage }} of {{ totalPages }}
-            </span>
-
-            <div class="d-flex gap-2">
-              <button
-                type="button"
-                class="btn btn-outline-secondary"
-                :disabled="currentPage === 1"
-                @click="changePage(currentPage - 1)"
-              >
-                Previous
-              </button>
-
-              <button
-                type="button"
-                class="btn btn-outline-secondary"
-                :disabled="currentPage === totalPages"
-                @click="changePage(currentPage + 1)"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        </template>
+        </div>
       </div>
     </div>
   </section>
 </template>
-
-<style scoped lang="scss">
-.user-avatar {
-  width: 42px;
-  height: 42px;
-  object-fit: cover;
-  border-radius: 50%;
-}
-</style>

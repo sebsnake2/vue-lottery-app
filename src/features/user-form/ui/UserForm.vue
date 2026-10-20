@@ -2,7 +2,12 @@
 import { watch } from "vue";
 import { useField, useForm } from "vee-validate";
 import * as yup from "yup";
+
 import type { CreateUserDto } from "@/entities/user";
+import {
+  AppButton,
+  AppInput,
+} from "@/shared/ui";
 
 const props = withDefaults(
   defineProps<{
@@ -145,118 +150,112 @@ const submitForm = handleSubmit((values) => {
 </script>
 
 <template>
-  <form @submit="submitForm">
+  <form @submit.prevent="submitForm">
     <div class="row g-3">
       <div class="col-md-6">
-        <label class="form-label">
+        <label
+          for="first-name"
+          class="form-label"
+        >
           First name
         </label>
 
-        <input
+        <AppInput
+          id="first-name"
           v-model="firstName"
-          type="text"
-          class="form-control"
-          :class="{ 'is-invalid': firstNameError }"
-        >
-
-        <div class="invalid-feedback">
-          {{ firstNameError }}
-        </div>
+          :error="firstNameError"
+        />
       </div>
 
       <div class="col-md-6">
-        <label class="form-label">
+        <label
+          for="last-name"
+          class="form-label"
+        >
           Last name
         </label>
 
-        <input
+        <AppInput
+          id="last-name"
           v-model="lastName"
-          type="text"
-          class="form-control"
-          :class="{ 'is-invalid': lastNameError }"
-        >
-
-        <div class="invalid-feedback">
-          {{ lastNameError }}
-        </div>
+          :error="lastNameError"
+        />
       </div>
 
       <div class="col-md-6">
-        <label class="form-label">
+        <label
+          for="email"
+          class="form-label"
+        >
           Email
         </label>
 
-        <input
+        <AppInput
+          id="email"
           v-model="email"
           type="email"
-          class="form-control"
-          :class="{ 'is-invalid': emailError }"
-        >
-
-        <div class="invalid-feedback">
-          {{ emailError }}
-        </div>
+          :error="emailError"
+        />
       </div>
 
       <div class="col-md-6">
-        <label class="form-label">
+        <label
+          for="username"
+          class="form-label"
+        >
           Username
         </label>
 
-        <input
+        <AppInput
+          id="username"
           v-model="username"
-          type="text"
-          class="form-control"
-          :class="{ 'is-invalid': usernameError }"
-        >
-
-        <div class="invalid-feedback">
-          {{ usernameError }}
-        </div>
+          :error="usernameError"
+        />
       </div>
 
       <div class="col-md-6">
-        <label class="form-label">
+        <label
+          for="password"
+          class="form-label"
+        >
           Password
         </label>
 
-        <input
+        <AppInput
+          id="password"
           v-model="password"
           type="password"
-          class="form-control"
-          :class="{ 'is-invalid': passwordError }"
-        >
-
-        <div class="invalid-feedback">
-          {{ passwordError }}
-        </div>
+          :error="passwordError"
+        />
       </div>
 
       <div class="col-md-6">
-        <label class="form-label">
+        <label
+          for="age"
+          class="form-label"
+        >
           Age
         </label>
 
-        <input
-          v-model.number="age"
+        <AppInput
+          id="age"
+          :model-value="age"
           type="number"
-          min="1"
-          max="120"
-          class="form-control"
-          :class="{ 'is-invalid': ageError }"
-        >
-
-        <div class="invalid-feedback">
-          {{ ageError }}
-        </div>
+          :error="ageError"
+          @update:model-value="age = Number($event)"
+        />
       </div>
 
       <div class="col-md-6">
-        <label class="form-label">
+        <label
+          for="gender"
+          class="form-label"
+        >
           Gender
         </label>
 
         <select
+          id="gender"
           v-model="gender"
           class="form-select"
           :class="{ 'is-invalid': genderError }"
@@ -270,36 +269,36 @@ const submitForm = handleSubmit((values) => {
           </option>
         </select>
 
-        <div class="invalid-feedback">
+        <div
+          v-if="genderError"
+          class="invalid-feedback"
+        >
           {{ genderError }}
         </div>
       </div>
 
       <div class="col-md-6">
-        <label class="form-label">
+        <label
+          for="phone"
+          class="form-label"
+        >
           Phone
         </label>
 
-        <input
+        <AppInput
+          id="phone"
           v-model="phone"
-          type="text"
-          class="form-control"
-          :class="{ 'is-invalid': phoneError }"
-        >
-
-        <div class="invalid-feedback">
-          {{ phoneError }}
-        </div>
+          :error="phoneError"
+        />
       </div>
     </div>
 
     <div class="d-flex justify-content-end mt-4">
-      <button
+      <AppButton
         type="submit"
-        class="btn btn-info text-white fw-semibold px-4"
-      >
-        {{ submitLabel }}
-      </button>
+        :label="submitLabel"
+        severity="info"
+      />
     </div>
   </form>
 </template>

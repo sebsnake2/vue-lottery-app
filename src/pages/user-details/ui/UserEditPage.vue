@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import UserForm from "../../../components/UserForm.vue";
-import { useUsersStore } from "../../../entities/user/model/users.store.ts";
+import { UserForm } from "@/features/user-form";
+import { useUsersStore } from "@/entities/user";
 
 import type {
   User,
