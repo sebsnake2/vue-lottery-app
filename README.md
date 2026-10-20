@@ -1,42 +1,234 @@
-# .
+# Vue Lottery App
 
-This template should help get you started developing with Vue 3 in Vite.
+Vue 3 application developed for the Client Web Systems course.
 
-## Recommended IDE Setup
+The project was refactored using **Feature-Sliced Design (FSD)** and includes routing, authentication, user management, REST API integration, Pinia state management, reusable UI components and light/dark themes.
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## Demo
 
-## Recommended Browser Setup
+GitHub Pages:
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+https://sebsnake2.github.io/vue-lottery-app/
 
-## Type Support for `.vue` Imports in TS
+## Repository
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+https://github.com/sebsnake2/vue-lottery-app
 
-## Customize configuration
+## Technologies
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+- Vue 3
+- TypeScript
+- Composition API
+- Vite
+- Vue Router
+- Pinia
+- pinia-plugin-persistedstate
+- PrimeVue
+- VeeValidate
+- Yup
+- SCSS
+- Bootstrap
+- REST API
+- Feature-Sliced Design
+- Steiger
+- ESLint
 
-## Project Setup
+## Features
 
-```sh
+- Client-side routing with Vue Router
+- Lazy-loaded pages
+- Authentication using JWT
+- Protected routes with navigation guards
+- User list from DummyJSON
+- User search
+- Pagination using query parameters
+- User details page
+- Create user
+- Edit user
+- Delete user with confirmation dialog
+- Repository pattern for API access
+- Pinia stores for application state
+- Reusable UI wrappers
+- Form validation with VeeValidate and Yup
+- Light and dark themes
+- Persisted theme state
+- 404 page
+- Dynamic browser page titles
+
+## Feature-Sliced Design
+
+The application follows the Feature-Sliced Design architecture.
+
+```text
+src/
+├── app/
+│   ├── providers/
+│   ├── styles/
+│   └── App.vue
+│
+├── pages/
+│   ├── home/
+│   ├── about/
+│   ├── users/
+│   ├── user-details/
+│   ├── login/
+│   └── not-found/
+│
+├── widgets/
+│   ├── app-header/
+│   └── users-table/
+│
+├── features/
+│   ├── auth/
+│   └── user-form/
+│
+├── entities/
+│   ├── user/
+│   ├── session/
+│   └── setting/
+│
+└── shared/
+    ├── api/
+    └── ui/
+```
+
+### Layer responsibilities
+
+- **app** — application initialization, providers, router integration and global styles.
+- **pages** — application pages corresponding to routes.
+- **widgets** — large independent UI blocks such as the application header and users table.
+- **features** — user actions such as authentication and user forms.
+- **entities** — business entities, stores, types and API services.
+- **shared** — reusable API infrastructure and UI components.
+
+## Architecture diagram
+
+```mermaid
+flowchart TD
+    App[app]
+
+    Pages[pages]
+    Widgets[widgets]
+    Features[features]
+    Entities[entities]
+    Shared[shared]
+
+    App --> Pages
+    App --> Widgets
+    App --> Features
+    App --> Entities
+    App --> Shared
+
+    Pages --> Widgets
+    Pages --> Features
+    Pages --> Entities
+    Pages --> Shared
+
+    Widgets --> Features
+    Widgets --> Entities
+    Widgets --> Shared
+
+    Features --> Entities
+    Features --> Shared
+
+    Entities --> Shared
+```
+
+Dependencies follow the FSD rule: higher layers may depend only on lower layers.
+
+## Repository pattern
+
+API access is separated from application UI using the Repository pattern.
+
+The application contains:
+
+- shared HTTP client
+- generic repository interfaces
+- `UserService`
+- `AuthService`
+- universal `ServiceProvider`
+
+Components and pages do not communicate with the REST API directly. They use Pinia stores and entity services.
+
+## State management
+
+Pinia is used for centralized application state.
+
+Main stores:
+
+- `useUsersStore` — user list, user details, loading state and CRUD operations.
+- `useSessionStore` — authentication state and tokens.
+- `useSettingsStore` — application theme.
+
+`pinia-plugin-persistedstate` is used to persist application settings.
+
+## UI library
+
+PrimeVue is used through reusable wrappers located in `shared/ui`:
+
+- `AppButton`
+- `AppInput`
+- `AppTable`
+- `AppConfirmDialog`
+
+Application pages and features use these wrappers instead of importing PrimeVue components directly.
+
+## API
+
+The project uses the public DummyJSON REST API.
+
+API URL is stored in the environment configuration:
+
+```env
+VITE_API_URL=https://dummyjson.com
+```
+
+The `.env` file is not committed to the repository.
+
+Use `.env.example` as an example.
+
+## Installation
+
+```bash
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+Create `.env`:
 
-```sh
+```env
+VITE_API_URL=https://dummyjson.com
+```
+
+Run the development server:
+
+```bash
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+## Build
 
-```sh
+```bash
 npm run build
 ```
+
+## Lint
+
+ESLint:
+
+```bash
+npm run lint
+```
+
+FSD architecture validation:
+
+```bash
+npm run lint:fsd
+```
+
+## Author
+
+Sebastian Burla
+
+Information Technology student at Yuriy Fedkovych Chernivtsi National University.
+
+GitHub: https://github.com/sebsnake2
