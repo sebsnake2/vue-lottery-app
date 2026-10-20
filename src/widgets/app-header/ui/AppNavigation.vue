@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { useSessionStore } from "@/entities/session";
 import { LogoutButton } from "@/features/auth";
+import { useSettingsStore } from "@/entities/setting";
+import { AppButton } from "@/shared/ui";
 
 const sessionStore = useSessionStore();
+const settingsStore = useSettingsStore();
 </script>
 
 <template>
@@ -28,6 +31,17 @@ const sessionStore = useSessionStore();
     >
       Users
     </RouterLink>
+
+    <AppButton
+      :label="
+        settingsStore.theme === 'dark'
+          ? 'Light'
+          : 'Dark'
+      "
+      severity="secondary"
+      :outlined="true"
+      @click="settingsStore.toggleTheme"
+    />
 
     <RouterLink
       v-if="!sessionStore.isAuthenticated"

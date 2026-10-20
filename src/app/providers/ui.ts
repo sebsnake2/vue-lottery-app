@@ -10,7 +10,7 @@ export function setupUi(app: App): void {
     theme: {
       preset: Aura,
       options: {
-      darkModeSelector: false,
+      darkModeSelector: ".app-dark",
     },
     },
   });
